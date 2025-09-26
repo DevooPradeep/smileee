@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Smiley Eyes Follow Mouse</title>
+  <title>Smiley Eyes Follow</title>
   <style>
     body {
       height: 100vh;
@@ -78,10 +78,12 @@
   </div>
 
   <script>
-    const eyes = document.querySelectorAll('.eye');
     const pupils = document.querySelectorAll('.pupil');
+    const maxDist = 20; // how far pupil can move
 
+    // Mouse control (for desktop)
     document.addEventListener('mousemove', (e) => {
+      const eyes = document.querySelectorAll('.eye');
       eyes.forEach((eye, i) => {
         const rect = eye.getBoundingClientRect();
         const eyeCenterX = rect.left + rect.width / 2;
@@ -91,11 +93,21 @@
         const dy = e.clientY - eyeCenterY;
 
         const angle = Math.atan2(dy, dx);
-        const maxDist = 20; // how far pupil can move
         const x = Math.cos(angle) * maxDist;
         const y = Math.sin(angle) * maxDist;
 
         pupils[i].style.transform = `translate(${x}px, ${y}px)`;
+      });
+    });
+
+    // Mobile tilt control
+    window.addEventListener('deviceorientation', (e) => {
+      // gamma = left-right tilt (-90 to 90), beta = up-down tilt (-180 to 180)
+      const x = (e.gamma / 45) * maxDist; // scale tilt
+      const y = (e.beta / 45) * maxDist;
+
+      pupils.forEach(pupil => {
+        pupil.style.transform = `translate(${x}px, ${y}px)`;
       });
     });
   </script>
